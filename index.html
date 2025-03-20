@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        /* Basic styling for the app */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .section-title {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .form input, .form button, .profile-form input, .profile-form button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .form button, .profile-form button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+
+        .form button:hover, .profile-form button:hover {
+            background-color: #218838;
+        }
+
+        #expenseList, #incomeList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #expenseList li, #incomeList li {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .report, .profile, .settings, .categories {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .settings button, .categories button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .settings button:hover, .categories button:hover {
+            background-color: #0056b3;
+        }
+
+        .categories ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .category-item img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .category-item h4 {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .category-item p {
+            color: #666;
+        }
+
+        /* Login Form */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form input {
+            margin-bottom: 10px;
+        }
+
+        .login-form button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .login-form button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .nav-bar button {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .nav-bar button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-form">
+        <h2>Login</h2>
+        <input type="text" id="loginUsername" placeholder="Username" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <button onclick="login()">Login</button>
+        <p id="loginError" style="color: red; display: none;">Invalid credentials, please try again.</p>
+    </div>
+
+    <!-- Main Expense Tracker App (Hidden until login) -->
+    <div id="expenseApp" class="container" style="display:none;">
+        <h1>Expense Tracker</h1>
+
+        <!-- Navigation Bar -->
+        <div class="nav-bar">
+            <button onclick="showSection('profile')">Profile</button>
+            <button onclick="showSection('expense')">Expenses</button>
+            <button onclick="showSection('income')">Income</button>
+            <button onclick="showSection('report')">Report</button>
+            <button onclick="showSection('categories')">Categories</button>
+            <button onclick="showSection('settings')">Settings</button>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile" class="section" style="display: none;">
+            <h3 class="section-title">Profile</h3>
+            <div class="profile-form">
+                <input type="text" id="userName" placeholder="Enter your name" />
+                <input type="email" id="userEmail" placeholder="Enter your email" />
+                <button onclick="saveProfile()">Save Profile</button>
+            </div>
+        </div>
+
+        <!-- Expense Section -->
+        <div id="expense" class="section" style="display: none;">
+            <h3 class="section-title">Add Expense</h3>
+            <input type="text" id="expenseName" placeholder="Expense Name" />
+            <input type="number" id="expenseAmount" placeholder="Amount" />
+            <button onclick="addExpense()">Add Expense</button>
+            <ul id="expenseList"></ul>
+        </div>
+
+        <!-- Income Section -->
+        <div id="income" class="section" style="display: none;">
+            <h3 class="section-title">Add Income</h3>
+            <input type="text" id="incomeName" placeholder="Income Source" />
+            <input type="number" id="incomeAmount" placeholder="Amount" />
+            <button onclick="addIncome()">Add Income</button>
+            <ul id="incomeList"></ul>
+        </div>
+
+        <!-- Report Section -->
+        <div id="report" class="section" style="display: none;">
+            <h3 class="section-title">Monthly Report</h3>
+            <p>Total Expenses: $<span id="totalExpenses">0</span></p>
+            <p>Total Income: $<span id="totalIncome">0</span></p>
+            <p>Total Balance: $<span id="totalBalance">0</span></p>
+            <button onclick="setBudget()">Set Monthly Budget</button>
+        </div>
+
+        <!-- Categories Section -->
+        <div id="categories" class="section" style="display: none;">
+            <h3 class="section-title">Categories</h3>
+            <button onclick="viewCategories()">View Categories</button>
+            <ul>
+                <li class="category-item">
+                    <img src="https://via.placeholder.com/100x100?text=Groceries" alt="Groceries" />
+                    <h4>Groceries</h4>
+                    <p>Items related to food, drinks, and household supplies.</p>
+                </li>
+                <li class="category-item">
+                    <img src="https://via.placeholder.com/100x100?text=Transportation" alt="Transportation" />
+                    <h4>Transportation</h4>
+                    <p>Expenses for commuting or travel, including fuel and tickets.</p>
+                </li>
+                <li class="category-item">
+                    <img src="https://via.placeholder.com/100x100?text=Entertainment" alt="Entertainment" />
+                    <h4>Entertainment</h4>
+                    <p>Expenses for activities such as movies, games, and leisure.</p>
+                </li>
+                <li class="category-item">
+                    <img src="https://via.placeholder.com/100x100?text=Utilities" alt="Utilities" />
+                    <h4>Utilities</h4>
+                    <p>Bills for electricity, water, gas, internet, and other services.</p>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings" class="section" style="display: none;">
+            <h3 class="section-title">Settings</h3>
+            <button onclick="resetApp()">Reset App</button>
+        </div>
+    </div>
+
+    <script>
+        let expenses = [];
+        let income = [];
+        let budget = 0;
+
+        // Login function
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const validUsername = 'user';
+            const validPassword = 'password';
+
+            if (username === validUsername && password === validPassword) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('expenseApp').style.display = 'block';
+                showSection('profile'); // Default section after login
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+            }
+        }
+
+        // Show Section function
+        function showSection(section) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach((sec) => {
+                sec.style.display = 'none';
+            });
+            document.getElementById(section).style.display = 'block';
+        }
+
+        // Save Profile
+        function saveProfile() {
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            if (name && email) {
+                alert(`Profile Saved: \nName: ${name} \nEmail: ${email}`);
+            } else {
+                alert("Please provide valid profile information.");
+            }
+        }
+
+        // Add Expense
+        function addExpense() {
+            const expenseName = document.getElementById('expenseName').value;
+            const expenseAmount = parseFloat(document.getElementById('expenseAmount').value);
+            if (expenseName && !isNaN(expenseAmount)) {
+                expenses.push({ name: expenseName, amount: expenseAmount });
+                updateExpenseList();
+                updateReport();
+            } else {
+                alert("Please provide valid inputs for the expense.");
+            }
+        }
+
+        // Add Income
+        function addIncome() {
+            const incomeName = document.getElementById('incomeName').value;
+            const incomeAmount = parseFloat(document.getElementById('incomeAmount').value);
+            if (incomeName && !isNaN(incomeAmount)) {
+                income.push({ name: incomeName, amount: incomeAmount });
+                updateIncomeList();
+                updateReport();
+            } else {
+                alert("Please provide valid inputs for the income.");
+            }
+        }
+
+        // Update Expense List
+        function updateExpenseList() {
+            const expenseList = document.getElementById('expenseList');
+            expenseList.innerHTML = '';
+            expenses.forEach((expense, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `${expense.name}: $${expense.amount.toFixed(2)} <button onclick="removeExpense(${index})">Delete</button>`;
+                expenseList.appendChild(listItem);
+            });
+        }
+
+        // Update Income List
+        function updateIncomeList() {
+            const incomeList = document.getElementById('incomeList');
+            incomeList.innerHTML = '';
+            income.forEach((inc, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `${inc.name}: $${inc.amount.toFixed(2)} <button onclick="removeIncome(${index})">Delete</button>`;
+                incomeList.appendChild(listItem);
+            });
+        }
+
+        // Remove Expense
+        function removeExpense(index) {
+            expenses.splice(index, 1);
+            updateExpenseList();
+            updateReport();
+        }
+
+        // Remove Income
+        function removeIncome(index) {
+            income.splice(index, 1);
+            updateIncomeList();
+            updateReport();
+        }
+
+        // Update Report
+        function updateReport() {
+            let totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0);
+            let totalIncome = income.reduce((acc, inc) => acc + inc.amount, 0);
+            let totalBalance = totalIncome - totalExpenses;
+
+            document.getElementById('totalExpenses').innerText = totalExpenses.toFixed(2);
+            document.getElementById('totalIncome').innerText = totalIncome.toFixed(2);
+            document.getElementById('totalBalance').innerText = totalBalance.toFixed(2);
+        }
+
+        // Set Monthly Budget
+        function setBudget() {
+            const userBudget = parseFloat(prompt("Enter your monthly budget:"));
+            if (!isNaN(userBudget) && userBudget > 0) {
+                budget = userBudget;
+                updateReport();
+            } else {
+                alert("Please enter a valid budget.");
+            }
+        }
+
+        // Reset App
+        function resetApp() {
+            if (confirm("Are you sure you want to reset the app? All data will be lost.")) {
+                expenses = [];
+                income = [];
+                budget = 0;
+                updateExpenseList();
+                updateIncomeList();
+                updateReport();
+            }
+        }
+    </script>
+</body>
+</html>
